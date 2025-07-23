@@ -3,6 +3,8 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuManager : MonoBehaviour
 {
+
+    public GameObject CustomGridPanel;
     public void OnStartClicked()
     {
         PlayerPrefs.SetInt("rows", 3);
@@ -12,7 +14,7 @@ public class MainMenuManager : MonoBehaviour
 
     public void OnCustomClicked()
     {
-        SceneManager.LoadScene(2);
+        CustomGridPanel.SetActive(true);
     }
 
     public void OnQuitClicked()

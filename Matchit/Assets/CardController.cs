@@ -13,7 +13,6 @@ public class CardController : MonoBehaviour
     [Header("UI Elements")]
     [SerializeField] private Image cardFront;
     [SerializeField] private Image cardBack;
-    [SerializeField] private TextMeshProUGUI debugText;
 
     [Header("Animation")]
     [SerializeField] private float flipDuration = 0.25f;
@@ -37,8 +36,8 @@ public class CardController : MonoBehaviour
         IsMatched = false;
         SetVisualState(false);
 
-        debugText.text = id.ToString();
-        Debug.Log($"[Init] Card initialized with ID: {id}");
+        //debugText.text = id.ToString();
+        Debug.Log($"Init Card initialized with ID: {id}");
     }
 
     private void Awake()
@@ -47,16 +46,16 @@ public class CardController : MonoBehaviour
         button = GetComponent<Button>();
         button.onClick.AddListener(OnCardClicked);
 
-        Debug.Log("[Awake] Button listener attached and audio source set.");
+        Debug.Log("Awake Button listener attached and audio source set.");
     }
 
     private void OnCardClicked()
     {
-        Debug.Log($"[Click] Card {CardID} clicked. Flipped: {IsFlipped}, Matched: {IsMatched}");
+        Debug.Log($"Click Card {CardID} clicked. Flipped: {IsFlipped}, Matched: {IsMatched}");
 
         if (IsFlipped || IsMatched)
         {
-            Debug.Log($"[Click Blocked] Card {CardID} is already flipped or matched.");
+            Debug.Log($"Click Blocked Card {CardID} is already flipped or matched.");
             return;
         }
 
@@ -67,7 +66,7 @@ public class CardController : MonoBehaviour
 
     public void Flip(bool showFront)
     {
-        Debug.Log($"[Flip] Card {CardID} → ShowFront: {showFront}");
+        Debug.Log($"Flip Card {CardID} → ShowFront: {showFront}");
         IsFlipped = showFront;
         StopAllCoroutines();
         StartCoroutine(FlipAnimation(showFront));
@@ -76,7 +75,7 @@ public class CardController : MonoBehaviour
     public void SetMatched(bool matched)
     {
         IsMatched = matched;
-        Debug.Log($"[MatchStatus] Card {CardID} matched: {matched}");
+        Debug.Log($"MatchStatus Card {CardID} matched: {matched}");
     }
     public void HideCard()
     {
@@ -88,28 +87,28 @@ public class CardController : MonoBehaviour
         IsMatched = false;
         IsFlipped = false;
         SetVisualState(false);
-        Debug.Log($"[Reset] Card {CardID} reset.");
+        Debug.Log($"Reset Card {CardID} reset.");
     }
 
     private void SetVisualState(bool showFront)
     {
-        Debug.Log($"[SetVisualState] Card {CardID} → ShowFront: {showFront}");
+        Debug.Log($"SetVisualState Card {CardID} → ShowFront: {showFront}");
 
         if (cardFront == null || cardBack == null)
         {
-            Debug.LogWarning($"[SetVisualState] cardFront or cardBack is missing on Card {CardID}");
+            Debug.LogWarning($"SetVisualState cardFront or cardBack is missing on Card {CardID}");
             return;
         }
 
         cardFront.gameObject.SetActive(showFront);
         cardBack.gameObject.SetActive(!showFront);
 
-        Debug.Log($"[SetVisualState] cardFront.SetActive({showFront}), cardBack.SetActive({!showFront})");
+        Debug.Log($"SetVisualState cardFront.SetActive({showFront}), cardBack.SetActive({!showFront})");
     }
 
     private System.Collections.IEnumerator FlipAnimation(bool showFront)
     {
-        Debug.Log($"[Animation] Card {CardID} flipping → ShowFront: {showFront}");
+        Debug.Log($"Animation Card {CardID} flipping → ShowFront: {showFront}");
 
         float time = 0f;
         Vector3 start = transform.localScale;
@@ -125,7 +124,7 @@ public class CardController : MonoBehaviour
         }
 
         transform.localScale = mid;
-        Debug.Log($"[Animation] Card {CardID} midpoint reached — toggling visual state");
+        Debug.Log($"Animation Card {CardID} midpoint reached — toggling visual state");
         SetVisualState(showFront);
 
         time = 0f;
@@ -139,12 +138,12 @@ public class CardController : MonoBehaviour
         }
 
         transform.localScale = end;
-        Debug.Log($"[Animation] Card {CardID} flip complete.");
+        Debug.Log($"Animation Card {CardID} flip complete.");
     }
 
     public void PlayMatchSound(bool matched)
     {
-        Debug.Log($"[Sound] Playing {(matched ? "match" : "mismatch")} sound for Card {CardID}");
+        Debug.Log($"Sound Playing {(matched ? "match" : "mismatch")} sound for Card {CardID}");
         PlaySound(matched ? matchSound : mismatchSound);
     }
 
@@ -156,7 +155,7 @@ public class CardController : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"[Audio] AudioClip missing or AudioSource not set on Card {CardID}");
+            Debug.LogWarning($"Audio AudioClip missing or AudioSource not set on Card {CardID}");
         }
     }
 }
