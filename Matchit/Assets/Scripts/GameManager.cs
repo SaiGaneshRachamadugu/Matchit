@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
@@ -26,24 +27,19 @@ public class GameManager : MonoBehaviour
 
     private int comboStreak = 0;
     private int highestStreak = 0;
+    [SerializeField] private CardPool cardPool;
 
     private void Start()
     {
         int rows = PlayerPrefs.GetInt("rows", 3);
         int cols = PlayerPrefs.GetInt("cols", 4);
-        //Card grid set to 3/4 by default//
         totalCards = rows * cols;
 
-        if (totalCards % 2 != 0)
-        {
-            Debug.LogWarning("Grid Setup Total cards must be even. Reducing by 1.");
-            totalCards -= 1;
-        }
+        if (totalCards % 2 != 0) totalCards--;
 
         totalPairs = totalCards / 2;
 
-        //Setup Grid layout//
-        GridLayoutGroup grid = layoutGroup.GetComponent<GridLayoutGroup>();
+        var grid = layoutGroup.GetComponent<GridLayoutGroup>();
         if (grid != null)
         {
             grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
@@ -52,6 +48,19 @@ public class GameManager : MonoBehaviour
 
         GenerateCards(totalCards);
         UpdateStatsUI();
+        StartCoroutine(MemoryPreviewCoroutine());
+    }
+
+    private IEnumerator MemoryPreviewCoroutine()
+    {
+        foreach (var card in activeCards)
+            card.Flip(true);
+
+        //Preview duration//
+        yield return new WaitForSeconds(0.5f);
+
+        foreach (var card in activeCards)
+            card.Flip(false);
     }
 
     private void GenerateCards(int totalCards)
@@ -68,14 +77,38 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < totalCards; i++)
         {
-            GameObject newCard = Instantiate(cardPrefab, layoutGroup);
-            CardController controller = newCard.GetComponent<CardController>();
-            Sprite faceSprite = cardFaceSprites[cardIDs[i] % cardFaceSprites.Length];
+            GameObject cardGO = cardPool.GetCard();
 
+            //Ensure correct parenting and reset scale//
+            cardGO.transform.SetParent(layoutGroup, false);
+
+            //Reset RectTransform in case of distortion from previous reuse//
+            RectTransform rect = cardGO.GetComponent<RectTransform>();
+            if (rect != null)
+            {
+                rect.localScale = Vector3.one;
+                rect.anchoredPosition3D = Vector3.zero;
+                rect.offsetMin = Vector2.zero;
+                rect.offsetMax = Vector2.zero;
+            }
+
+            CardController controller = cardGO.GetComponent<CardController>();
+            if (controller == null)
+            {
+                Debug.LogError("GameManager Card prefab missing CardController component.");
+                continue;
+            }
+
+            Sprite faceSprite = cardFaceSprites[cardIDs[i] % cardFaceSprites.Length];
             controller.Initialize(cardIDs[i], faceSprite, OnCardSelected);
             activeCards.Add(controller);
         }
+
+        UpdateStatsUI();
     }
+
+
+
 
     private void OnCardSelected(CardController selected)
     {
@@ -137,6 +170,45 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void RestartMatch()
+    {
+        ClearCards();
+
+        int rows = PlayerPrefs.GetInt("rows", 3);
+        int cols = PlayerPrefs.GetInt("cols", 4);
+        totalCards = rows * cols;
+
+        if (totalCards % 2 != 0)
+            totalCards--;
+
+        totalPairs = totalCards / 2;
+
+        GridLayoutGroup grid = layoutGroup.GetComponent<GridLayoutGroup>();
+        if (grid != null)
+        {
+            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            grid.constraintCount = cols;
+        }
+
+        victoryPanel.SetActive(false);
+        Confetti.Stop();
+        GenerateCards(totalCards);
+    }
+
+
+    private void ClearCards()
+    {
+        foreach (var card in activeCards)
+        {
+            cardPool.ReturnCard(card.gameObject);
+        }
+
+        activeCards.Clear();
+        matchedPairs = 0;
+        comboStreak = 0;
+        totalPairs = 0;
+        totalCards = 0;
+    }
 
     private void CheckVictory()
     {
