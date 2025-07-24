@@ -78,7 +78,7 @@ public class CardController : MonoBehaviour
     }
     public void HideCard()
     {
-        //Or use CanvasGroup fade for smooth gameplay//
+        //Use CanvasGroup fade for smooth gameplay//
         gameObject.SetActive(false);
     }
 
@@ -96,7 +96,7 @@ public class CardController : MonoBehaviour
 
         if (cardFront == null || cardBack == null)
         {
-            Debug.LogWarning($"SetVisualState cardFront or cardBack is missing on Card {CardID}");
+            Debug.Log($"SetVisualState cardFront or cardBack is missing on Card {CardID}");
             return;
         }
 

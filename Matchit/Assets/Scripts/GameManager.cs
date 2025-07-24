@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject victoryPanel;
     [SerializeField] private TextMeshProUGUI statsText;
     [SerializeField] private ParticleSystem Confetti;
+    [SerializeField] private TextMeshProUGUI scoreText;
 
     private List<CardController> activeCards = new List<CardController>();
     private CardController firstSelected = null;
@@ -57,7 +58,7 @@ public class GameManager : MonoBehaviour
             card.Flip(true);
 
         //Preview duration//
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.8f);
 
         foreach (var card in activeCards)
             card.Flip(false);
@@ -107,9 +108,6 @@ public class GameManager : MonoBehaviour
         UpdateStatsUI();
     }
 
-
-
-
     private void OnCardSelected(CardController selected)
     {
         if (firstSelected == null)
@@ -149,6 +147,8 @@ public class GameManager : MonoBehaviour
             matchedPairs++;
             comboStreak++;
             highestStreak = Mathf.Max(highestStreak, comboStreak);
+            ScoreManager.Instance.AddScore(10);
+            UpdateScoreUI();
 
             UpdateStatsUI();
             CheckVictory();
@@ -158,7 +158,6 @@ public class GameManager : MonoBehaviour
         secondSelected = null;
     }
 
-
     private void UpdateStatsUI()
     {
         int matchedCards = matchedPairs * 2;
@@ -166,7 +165,15 @@ public class GameManager : MonoBehaviour
 
         if (statsText != null)
         {
-            statsText.text = $"Matches: {matchedPairs}\nRemaining: {remainingCards}\n Streak: {comboStreak}";
+            statsText.text = $"Card Matches: {matchedPairs}\nRemaining: {remainingCards}\n Streak: {comboStreak}";
+        }
+    }
+
+    private void UpdateScoreUI()
+    {
+        if (scoreText != null)
+        {
+            scoreText.text = $"Total Score: {ScoreManager.Instance.CurrentScore}";
         }
     }
 
@@ -194,7 +201,6 @@ public class GameManager : MonoBehaviour
         Confetti.Stop();
         GenerateCards(totalCards);
     }
-
 
     private void ClearCards()
     {

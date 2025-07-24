@@ -36,8 +36,8 @@ public class CardPool : MonoBehaviour
             card = pool.Dequeue();
         }
         else
-        {
-            Debug.LogWarning("[CardPool] Pool empty. Instantiating new card.");
+        { 
+            //If pool empty create new pool//
             card = Instantiate(cardPrefab);
         }
 
