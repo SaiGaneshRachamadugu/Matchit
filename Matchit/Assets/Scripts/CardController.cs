@@ -45,8 +45,7 @@ public class CardController : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         button = GetComponent<Button>();
         button.onClick.AddListener(OnCardClicked);
-
-        Debug.Log("Awake Button listener attached and audio source set.");
+        //Debug.Log("Awake Button listener attached and audio source set.");
     }
 
     private void OnCardClicked()
