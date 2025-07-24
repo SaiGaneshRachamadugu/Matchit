@@ -24,10 +24,14 @@ public class GameManager : MonoBehaviour
     private int totalPairs = 0;
     private int matchedPairs = 0;
 
+    private int comboStreak = 0;
+    private int highestStreak = 0;
+
     private void Start()
     {
-        int rows = PlayerPrefs.GetInt("rows", 3); // default to 3x4
+        int rows = PlayerPrefs.GetInt("rows", 3);
         int cols = PlayerPrefs.GetInt("cols", 4);
+        //Card grid set to 3/4 by default//
         totalCards = rows * cols;
 
         if (totalCards % 2 != 0)
@@ -38,7 +42,7 @@ public class GameManager : MonoBehaviour
 
         totalPairs = totalCards / 2;
 
-        // Setup Grid layout
+        //Setup Grid layout//
         GridLayoutGroup grid = layoutGroup.GetComponent<GridLayoutGroup>();
         if (grid != null)
         {
@@ -47,7 +51,7 @@ public class GameManager : MonoBehaviour
         }
 
         GenerateCards(totalCards);
-        UpdateStatsUI(); // Initial update
+        UpdateStatsUI();
     }
 
     private void GenerateCards(int totalCards)
@@ -99,6 +103,7 @@ public class GameManager : MonoBehaviour
         {
             firstSelected.Flip(false);
             secondSelected.Flip(false);
+            comboStreak = 0;
         }
         else
         {
@@ -109,13 +114,17 @@ public class GameManager : MonoBehaviour
             secondSelected.HideCard();
 
             matchedPairs++;
-            UpdateStatsUI(); // Update on successful match
+            comboStreak++;
+            highestStreak = Mathf.Max(highestStreak, comboStreak);
+
+            UpdateStatsUI();
             CheckVictory();
         }
 
         firstSelected = null;
         secondSelected = null;
     }
+
 
     private void UpdateStatsUI()
     {
@@ -124,9 +133,10 @@ public class GameManager : MonoBehaviour
 
         if (statsText != null)
         {
-            statsText.text = $"Matches: {matchedPairs}\n Remaining: {remainingCards}";
+            statsText.text = $"Matches: {matchedPairs}\nRemaining: {remainingCards}\n Streak: {comboStreak}";
         }
     }
+
 
     private void CheckVictory()
     {

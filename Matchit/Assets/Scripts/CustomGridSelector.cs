@@ -11,7 +11,6 @@ public class CustomGridSelector : MonoBehaviour
 
     public void SetGrid_2x2() => SetGrid(2, 2);
     public void SetGrid_2x3() => SetGrid(2, 3);
-    public void SetGrid_5x6() => SetGrid(5, 6);
     public void SetGrid_5x5() => SetGrid(5, 5);
     public void SetGrid_3x3() => SetGrid(3, 3);
     public void SetGrid_4x4() => SetGrid(4, 4);

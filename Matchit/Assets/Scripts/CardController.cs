@@ -79,7 +79,8 @@ public class CardController : MonoBehaviour
     }
     public void HideCard()
     {
-        gameObject.SetActive(false); // or use CanvasGroup fade for smoother UX
+        //Or use CanvasGroup fade for smooth gameplay//
+        gameObject.SetActive(false);
     }
 
     public void ResetCard()
@@ -115,7 +116,7 @@ public class CardController : MonoBehaviour
         Vector3 mid = new Vector3(0f, start.y, start.z);
         Vector3 end = start;
 
-        // Shrink phase
+        //Shrink phase//
         while (time < flipDuration / 2f)
         {
             transform.localScale = Vector3.Lerp(start, mid, time / (flipDuration / 2f));
@@ -129,7 +130,7 @@ public class CardController : MonoBehaviour
 
         time = 0f;
 
-        // Expand phase
+        //Expand phase//
         while (time < flipDuration / 2f)
         {
             transform.localScale = Vector3.Lerp(mid, end, time / (flipDuration / 2f));
