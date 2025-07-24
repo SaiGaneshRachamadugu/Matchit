@@ -18,6 +18,17 @@ public class GameManager : MonoBehaviour
     [SerializeField] private ParticleSystem Confetti;
     [SerializeField] private TextMeshProUGUI scoreText;
 
+    [Header("Hint System")]
+    [SerializeField] private Button hintButton;
+    [SerializeField] private TextMeshProUGUI hintText;
+    [SerializeField] private int maxHints = 3;
+    [SerializeField] private float hintDuration = 0.8f;
+    [SerializeField] private float hintCooldown = 5f;
+
+    private int hintsUsed = 0;
+    private bool isHintOnCooldown = false;
+
+
     private List<CardController> activeCards = new List<CardController>();
     private CardController firstSelected = null;
     private CardController secondSelected = null;
@@ -238,6 +249,61 @@ public class GameManager : MonoBehaviour
             list[randomIndex] = temp;
         }
     }
+
+    public void RevealHint()
+    {
+        if (hintsUsed >= maxHints || isHintOnCooldown) return;
+
+        hintsUsed++;
+        UpdateHintUI();
+        StartCoroutine(RevealHintCoroutine());
+    }
+
+    private IEnumerator RevealHintCoroutine()
+    {
+        isHintOnCooldown = true;
+        hintButton.interactable = false;
+
+        Debug.Log("[Hint] Revealing all unmatched cards...");
+
+        foreach (var card in activeCards)
+        {
+            if (!card.IsMatched)
+                card.Flip(true);
+        }
+
+        yield return new WaitForSeconds(hintDuration);
+
+        foreach (var card in activeCards)
+        {
+            if (!card.IsMatched && card != firstSelected && card != secondSelected)
+                card.Flip(false);
+        }
+
+        Debug.Log("[Hint] Hint ended. Starting cooldown...");
+
+        // Wait for cooldown
+        yield return new WaitForSeconds(hintCooldown);
+
+        isHintOnCooldown = false;
+
+        // Re-enable only if hints are still available
+        if (hintsUsed < maxHints)
+            hintButton.interactable = true;
+    }
+
+    private void UpdateHintUI()
+    {
+        if (hintText != null)
+            hintText.text = $"Hints Left: {maxHints - hintsUsed}";
+
+        if (hintsUsed >= maxHints)
+        {
+            hintButton.interactable = false;
+            Debug.Log("[Hint] All hints used.");
+        }
+    }
+
 
     public void OnQuitBtn()
     {
